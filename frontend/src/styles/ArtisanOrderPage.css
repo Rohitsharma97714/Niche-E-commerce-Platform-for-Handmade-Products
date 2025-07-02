@@ -1,0 +1,63 @@
+.artisan-order-page {
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+  background: #fffaf2;
+  min-height: 100vh;
+}
+
+.artisan-order-page h2 {
+  color: #cc5200;
+  margin-bottom: 1.5rem;
+}
+
+.order-card {
+  background: #fff;
+  margin-bottom: 1.2rem;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.order-card .order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.order-card .order-items {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+}
+
+.order-card .order-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.order-card .order-item img {
+  width: 50px;
+  height: 50px;
+  margin-right: 1rem;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.order-status-select {
+  padding: 0.4rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 0.5rem;
+  background-color: #fff3e6;
+}
+
+.update-status-btn {
+  margin-top: 0.6rem;
+  padding: 0.5rem 1rem;
+  background: #cc5200;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

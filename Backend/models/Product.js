@@ -6,7 +6,8 @@ const productSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   image: { type: String, required: true },
   category: String,
-  artisanId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  artisanId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  
   isApproved: { type: Boolean, default: false },
 });
 

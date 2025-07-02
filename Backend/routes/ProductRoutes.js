@@ -14,6 +14,7 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ message: 'Artisan not found' });
     }
 
+    // ✅ Corrected logic: Only allow if artisan is approved
     if (artisan.role === 'artisan' && !artisan.isApproved) {
       return res.status(403).json({ message: 'Your artisan profile is not approved yet.' });
     }
@@ -22,9 +23,11 @@ router.post('/', async (req, res) => {
     await product.save();
     res.status(201).json(product);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('[Product POST Error]', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
   }
 });
+
 
 // ✅ Get all approved products (for customers)
 router.get('/', async (req, res) => {
