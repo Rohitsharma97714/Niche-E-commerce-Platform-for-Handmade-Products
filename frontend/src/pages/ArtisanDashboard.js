@@ -15,8 +15,9 @@ const ArtisanDashboard = () => {
     _id: ''
   });
 
+  //const artisanId = '684bd1139b419c567ba4f4fa'; // Replace with dynamic login later
   const user = JSON.parse(localStorage.getItem('user'));
-  const artisanId = user?._id;
+  const artisanId = user?._id; 
 
   const fetchProducts = async () => {
     const res = await axios.get(`http://localhost:5000/api/products/artisan/${artisanId}`);
