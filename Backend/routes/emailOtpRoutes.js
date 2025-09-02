@@ -5,9 +5,9 @@ const router = express.Router();
 
 const otpStore = new Map(); // Temporary OTP store
 
-// ✅ Debug check for environment variables
-console.log('📧 MAIL_USER:', process.env.MAIL_USER);
-console.log('🔐 MAIL_PASS:', process.env.MAIL_PASS ? 'Loaded ✅' : '❌ Missing');
+// // ✅ Debug check for environment variables
+// console.log('📧 MAIL_USER:', process.env.MAIL_USER);
+// console.log('🔐 MAIL_PASS:', process.env.MAIL_PASS ? 'Loaded ✅' : '❌ Missing');
 
 // ✅ Setup Nodemailer transporter with debug
 const transporter = nodemailer.createTransport({
