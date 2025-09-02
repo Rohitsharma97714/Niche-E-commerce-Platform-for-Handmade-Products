@@ -113,7 +113,12 @@ const HomePage = () => {
               type="text"
               placeholder="Search handmade treasures..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setTimeout(() => {
+                  document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100); // Ensure the grid updates before scrolling
+              }}
               className="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
             />
           </div>
@@ -121,7 +126,12 @@ const HomePage = () => {
             <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setTimeout(() => {
+                  document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100); // Add a slight delay to ensure the grid is updated before scrolling
+              }}
               className="appearance-none pl-4 pr-10 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
             >
               <option value="">All Categories</option>
@@ -407,7 +417,7 @@ const HomePage = () => {
       </div>
 
       {/* Product Grid */}
-      <div className="px-4 py-12 max-w-7xl mx-auto">
+      <div id="product-grid" className="px-4 py-12 max-w-7xl mx-auto">
         <h3 className="text-2xl font-bold mb-8 text-center">✨ Handpicked For You</h3>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredProducts.slice(0, visibleProducts).map((p, index) => (
