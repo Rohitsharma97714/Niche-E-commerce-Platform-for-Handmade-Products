@@ -34,10 +34,15 @@ const HomePage = () => {
 
   const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
 
-  // Scroll to top on component mount (page refresh)
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  
+    // Scroll to top on page refresh
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }, []);
 
   useEffect(() => {
     const fetchFeatured = async () => {
