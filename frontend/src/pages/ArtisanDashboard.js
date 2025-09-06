@@ -77,7 +77,7 @@ const ArtisanProfile = ({ user }) => {
 };
 
 // ArtisanDashboard Component
-const ArtisanDashboard = () => {
+const ArtisanDashboard = ({ darkMode }) => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [form, setForm] = useState({
@@ -187,19 +187,19 @@ const ArtisanDashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className={`min-h-screen w-full px-4 py-6 ${darkMode ? 'bg-gray-900 text-gray-100' : ''}`}>
       <h2 className="text-3xl font-bold text-center mb-2">👨‍🎨 Artisan Dashboard</h2>
 
       <ArtisanProfile user={user} />
 
       {/* Product Form */}
-      <form onSubmit={handleSubmit} className="bg-gradient-to-br from-orange-50 to-blue-50 shadow-lg rounded-xl p-8 mb-10 space-y-6 border border-orange-100">
+      <form onSubmit={handleSubmit} className={`shadow-lg rounded-xl p-8 mb-10 space-y-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-br from-orange-50 to-blue-50 border-orange-100'}`}>
         <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
           {form._id ? '✏️ Edit Product' : '➕ Add New Product'}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="title" className="block mb-1 font-medium text-gray-700">📝 Product Title</label>
+            <label htmlFor="title" className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>📝 Product Title</label>
             <input
               id="title"
               name="title"
@@ -207,11 +207,11 @@ const ArtisanDashboard = () => {
               value={form.title}
               onChange={handleChange}
               required
-              className="input input-bordered w-full focus:ring-2 focus:ring-orange-400"
+              className={`input input-bordered w-full focus:ring-2 focus:ring-orange-400 ${darkMode ? 'bg-gray-700 text-white border-gray-600' : ''}`}
             />
           </div>
           <div>
-            <label htmlFor="price" className="block mb-1 font-medium text-gray-700">💰 Price (₹)</label>
+            <label htmlFor="price" className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>💰 Price (₹)</label>
             <input
               id="price"
               name="price"
@@ -220,34 +220,34 @@ const ArtisanDashboard = () => {
               value={form.price}
               onChange={handleChange}
               required
-              className="input input-bordered w-full focus:ring-2 focus:ring-orange-400"
+              className={`input input-bordered w-full focus:ring-2 focus:ring-orange-400 ${darkMode ? 'bg-gray-700 text-white border-gray-600' : ''}`}
             />
           </div>
           <div>
-            <label htmlFor="category" className="block mb-1 font-medium text-gray-700">🏷️ Category</label>
+            <label htmlFor="category" className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>🏷️ Category</label>
             <input
               id="category"
               name="category"
               placeholder="e.g. Home Decor"
               value={form.category}
               onChange={handleChange}
-              className="input input-bordered w-full focus:ring-2 focus:ring-orange-400"
+              className={`input input-bordered w-full focus:ring-2 focus:ring-orange-400 ${darkMode ? 'bg-gray-700 text-white border-gray-600' : ''}`}
             />
           </div>
           <div>
-            <label htmlFor="image" className="block mb-1 font-medium text-gray-700">🖼️ Image URL</label>
+            <label htmlFor="image" className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>🖼️ Image URL</label>
             <input
               id="image"
               name="image"
               placeholder="Paste image URL"
               value={form.image}
               onChange={handleChange}
-              className="input input-bordered w-full focus:ring-2 focus:ring-orange-400"
+              className={`input input-bordered w-full focus:ring-2 focus:ring-orange-400 ${darkMode ? 'bg-gray-700 text-white border-gray-600' : ''}`}
             />
           </div>
         </div>
         <div>
-          <label htmlFor="description" className="block mb-1 font-medium text-gray-700">📝 Description</label>
+          <label htmlFor="description" className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>📝 Description</label>
           <textarea
             id="description"
             name="description"
@@ -255,7 +255,7 @@ const ArtisanDashboard = () => {
             value={form.description}
             onChange={handleChange}
             required
-            className="textarea textarea-bordered w-full mt-2 focus:ring-2 focus:ring-orange-400"
+            className={`textarea textarea-bordered w-full mt-2 focus:ring-2 focus:ring-orange-400 ${darkMode ? 'bg-gray-700 text-white border-gray-600' : ''}`}
             rows={3}
           />
         </div>
@@ -271,10 +271,10 @@ const ArtisanDashboard = () => {
       <h3 className="text-xl font-semibold mb-4">📦 My Products</h3>
       <ul className="space-y-3 mb-10">
         {products.map(p => (
-          <li key={p._id} className="bg-white shadow-md p-4 rounded flex justify-between items-center">
+          <li key={p._id} className={`shadow-md p-4 rounded flex justify-between items-center ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <div>
               <p className="font-semibold">{p.title}</p>
-              <p className="text-gray-500">₹{p.price} {p.isApproved ? '✅' : '❌'}</p>
+              <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>₹{p.price} {p.isApproved ? '✅' : '❌'}</p>
             </div>
             <div className="flex gap-2">
               <button onClick={() => handleEdit(p)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">Edit</button>
@@ -288,10 +288,10 @@ const ArtisanDashboard = () => {
       <h3 className="text-xl font-semibold mb-4">📬 Orders to Manage</h3>
       <div className="space-y-6">
         {orders.length === 0 ? (
-          <p className="text-gray-500">No orders found.</p>
+          <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>No orders found.</p>
         ) : (
           orders.map(order => (
-            <div key={order._id} className="bg-white shadow-md rounded p-4 space-y-2">
+            <div key={order._id} className={`shadow-md rounded p-4 space-y-2 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <p><strong>Order ID:</strong> {order._id}</p>
               <p><strong>Customer:</strong> {order.user?.name || 'Unknown'}</p>
               <p><strong>Total:</strong> ₹{order.total}</p>

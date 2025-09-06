@@ -63,8 +63,9 @@ const ProductDetailsPage = () => {
   if (!product) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start bg-white rounded-lg shadow-lg p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-10">
+      <div className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg shadow-lg p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <img
           src={product.image || 'https://via.placeholder.com/300'}
           alt={product.title}
@@ -82,8 +83,8 @@ const ProductDetailsPage = () => {
             </span>
           </div>
 
-          <p className="text-xl text-gray-800 font-semibold">₹{product.price}</p>
-          <p className="text-gray-700">{product.description}</p>
+          <p className="text-xl text-gray-800 font-semibold dark:text-gray-200">₹{product.price}</p>
+          <p className="text-gray-700 dark:text-gray-300">{product.description}</p>
 
           <div className="flex items-center gap-2">
             <label htmlFor="quantity" className="font-medium">Quantity:</label>
@@ -94,7 +95,7 @@ const ProductDetailsPage = () => {
               max="10"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
-              className="w-20 px-2 py-1 border rounded"
+              className="w-20 px-2 py-1 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
             />
           </div>
 
@@ -152,7 +153,71 @@ const ProductDetailsPage = () => {
         </div>
       </div>
 
+      {/* Recommended Products Section */}
+      <RecommendedProducts category={product.category} currentProductId={product._id} />
+
+      </div>
+
       <ToastContainer position="top-center" autoClose={2000} />
+    </div>
+  );
+};
+
+const RecommendedProducts = ({ category, currentProductId }) => {
+  const [recommended, setRecommended] = React.useState([]);
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const fetchRecommended = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/products?category=${encodeURIComponent(category)}`);
+        // Filter out current product
+        const filtered = res.data.filter(p => p._id !== currentProductId);
+        setRecommended(filtered); // Show all recommended products
+      } catch (error) {
+        console.error('Failed to fetch recommended products', error);
+      }
+    };
+    if (category) fetchRecommended();
+  }, [category, currentProductId]);
+
+  if (recommended.length === 0) return null;
+
+  const handleProductClick = (productId) => {
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Navigate to product after a short delay to allow scroll
+    setTimeout(() => {
+      navigate(`/product/${productId}`);
+    }, 300);
+  };
+
+  return (
+    <div className="mt-16 bg-gradient-to-r from-orange-50 to-pink-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-8">
+      <h3 className="text-3xl font-bold mb-8 text-center text-orange-600 dark:text-orange-400">✨ You Might Also Like</h3>
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex gap-6 pb-4" style={{ width: 'max-content' }}>
+          {recommended.map(product => (
+            <div
+              key={product._id}
+              onClick={() => handleProductClick(product._id)}
+              className="cursor-pointer bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-orange-100 dark:border-gray-700 flex-shrink-0 w-64"
+            >
+              <div className="relative overflow-hidden rounded-lg mb-3">
+                <img
+                  src={product.image}
+                  alt={product.title}
+                  className="w-full h-40 object-contain transition-transform duration-300 hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <h4 className="font-semibold text-lg mb-1 line-clamp-2">{product.title}</h4>
+              <p className="text-indigo-600 dark:text-indigo-400 text-sm mb-2">{product.category}</p>
+              <p className="text-orange-600 dark:text-orange-400 font-bold text-lg">₹{product.price}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

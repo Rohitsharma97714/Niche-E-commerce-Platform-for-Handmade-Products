@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import '../index.css';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ darkMode }) => {
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [unapprovedArtisans, setUnapprovedArtisans] = useState([]);
@@ -104,7 +104,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100 p-6 text-gray-800">
+    <div className="relative min-h-screen bg-gray-100 dark:bg-gray-900 p-6 text-gray-800 dark:text-gray-100">
       {/* Profile Dropdown */}
       <div className="absolute top-6 right-6" ref={dropdownRef}>
         <div className="relative inline-block text-left">
@@ -115,16 +115,26 @@ const AdminDashboard = () => {
             {user?.name || 'Admin'} ▼
           </button>
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-44 bg-white border rounded shadow-lg z-50">
+            <div className={`absolute right-0 mt-2 w-44 border rounded shadow-lg z-50 ${
+              darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300'
+            }`}>
               <button
                 onClick={handleUpdatePassword}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                className={`block w-full text-left px-4 py-2 ${
+                  darkMode
+                    ? 'text-gray-200 hover:bg-gray-700'
+                    : 'text-gray-800 hover:bg-gray-100'
+                }`}
               >
                 Update Password
               </button>
               <button
                 onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                className={`block w-full text-left px-4 py-2 ${
+                  darkMode
+                    ? 'text-gray-200 hover:bg-gray-700'
+                    : 'text-gray-800 hover:bg-gray-100'
+                }`}
               >
                 Logout
               </button>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ArtisanDashboard from './pages/ArtisanDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -10,6 +10,8 @@ import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import CategoryPage from './pages/CategoryPage';
 import MyOrdersPage from './pages/MyOrdersPage';
+import ProfilePage from './pages/ProfilePage';
+
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import UpdatePasswordPage from './pages/UpdatePasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -23,6 +25,33 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
+  const [darkMode, setDarkMode] = useState(false);
+
+  // ✅ Load saved theme
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const isDark = savedTheme === 'dark';
+    setDarkMode(isDark);
+    document.documentElement.classList.toggle('dark', isDark);
+  }, []);
+
+  // ✅ Toggle theme
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
+    // Removed direct class toggle here to handle in useEffect
+  };
+
+  // Sync dark class on document.documentElement with darkMode state
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
   return (
     <WishlistProvider>
       <CartProvider>
@@ -30,20 +59,21 @@ function App() {
           <ToastContainer position="top-right" autoClose={3000} />
           <Routes>
             {/* HomePage — No NavBar */}
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomePage darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
 
             {/* Routes with NavBar */}
-            <Route path="/product/:id" element={<><NavBar /><ProductDetailsPage /></>} />
-            <Route path="/login" element={<><NavBar /><LoginPage /></>} />
-            <Route path="/register" element={<><NavBar /><RegisterPage /></>} />
-            <Route path="/category/:categoryName" element={<><NavBar /><CategoryPage /></>} />
-            <Route path="/orders" element={<><NavBar /><MyOrdersPage /></>} />
-            <Route path="/forgot-password" element={<><NavBar /><ForgotPasswordPage /></>} />
-            <Route path="/update-password" element={<><NavBar /><UpdatePasswordPage /></>} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms" element={<TermsConditionsPage />} />
-            <Route path="/wishlist" element={<><NavBar /><WishlistPage /></>} />
+          <Route path="/product/:id" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><ProductDetailsPage /></>} />
+          <Route path="/login" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><LoginPage /></>} />
+          <Route path="/register" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><RegisterPage /></>} />
+          <Route path="/category/:categoryName" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><CategoryPage /></>} />
+          <Route path="/orders" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><MyOrdersPage darkMode={darkMode} /></>} />
+          <Route path="/forgot-password" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><ForgotPasswordPage /></>} />
+          <Route path="/update-password" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><UpdatePasswordPage darkMode={darkMode} /></>} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/privacy" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><PrivacyPolicyPage darkMode={darkMode} /></>} />
+          <Route path="/terms" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><TermsConditionsPage darkMode={darkMode} /></>} />
+          <Route path="/wishlist" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><WishlistPage /></>} />
+          <Route path="/profile" element={<><NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} /><ProfilePage darkMode={darkMode} /></>} />
 
             {/* Protected route: Customer/Artisan/Admin can access cart */}
             <Route
@@ -51,7 +81,7 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['customer', 'artisan', 'admin']}>
                   <>
-                    <NavBar />
+                    <NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
                     <CartPage />
                   </>
                 </ProtectedRoute>
@@ -64,8 +94,8 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <>
-                    <NavBar />
-                    <AdminDashboard />
+                    <NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+                    <AdminDashboard darkMode={darkMode} />
                   </>
                 </ProtectedRoute>
               }
@@ -77,8 +107,8 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['artisan']}>
                   <>
-                    <NavBar />
-                    <ArtisanDashboard />
+                    <NavBar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+                    <ArtisanDashboard darkMode={darkMode} />
                   </>
                 </ProtectedRoute>
               }

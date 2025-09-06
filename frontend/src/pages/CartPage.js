@@ -180,11 +180,12 @@ const CartPage = () => {
 };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold mb-4">🛒 Your Cart</h2>
 
       {cartItems.length === 0 ? (
-        <p className="text-gray-600">Your cart is empty.</p>
+        <p className="text-gray-600 dark:text-gray-400">Your cart is empty.</p>
       ) : (
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left - Cart or Delivery Form */}
@@ -192,28 +193,28 @@ const CartPage = () => {
             {!showDeliveryForm ? (
               <ul className="space-y-6">
                 {cartItems.map((item, index) => (
-                  <li key={index} className="flex gap-4 border p-4 rounded shadow-sm">
-                    <img src={item.image} alt={item.title} className="w-full h-48 object-contain bg-white" />
+                  <li key={index} className="flex gap-4 border p-4 rounded shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                    <img src={item.image} alt={item.title} className="w-full h-48 object-contain bg-white dark:bg-gray-700" />
                     <div className="flex-1">
                       <h4 className="text-lg font-semibold">{item.title}</h4>
-                      <p className="text-sm text-gray-600">Price: ₹{item.price}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Price: ₹{item.price}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <button
                           onClick={() => decreaseQuantity(item._id)}
-                          className="bg-gray-200 px-2 py-1 rounded"
+                          className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-gray-900 dark:text-gray-100"
                         >
                           -
                         </button>
                         <span>{item.quantity}</span>
                         <button
                           onClick={() => increaseQuantity(item._id)}
-                          className="bg-gray-200 px-2 py-1 rounded"
+                          className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-gray-900 dark:text-gray-100"
                         >
                           +
                         </button>
                       </div>
                       <button
-                        className="mt-2 text-red-600 hover:underline"
+                        className="mt-2 text-red-600 hover:underline dark:text-red-400"
                         onClick={() => handleRemove(item._id)}
                       >
                         Remove
@@ -238,7 +239,7 @@ const CartPage = () => {
                     placeholder={placeholder}
                     value={deliveryDetails[name]}
                     onChange={(e) => setDeliveryDetails({ ...deliveryDetails, [name]: e.target.value })}
-                    className="w-full border p-2 rounded"
+                    className="w-full border p-2 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                   />
                 ))}
                 <textarea
@@ -246,13 +247,13 @@ const CartPage = () => {
                   rows="3"
                   value={deliveryDetails.address}
                   onChange={(e) => setDeliveryDetails({ ...deliveryDetails, address: e.target.value })}
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                 ></textarea>
 
                 <select
                   value={deliveryDetails.paymentMode}
                   onChange={(e) => setDeliveryDetails({ ...deliveryDetails, paymentMode: e.target.value })}
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                 >
                   <option value="">Select Payment Mode</option>
                   <option value="cod">Cash on Delivery</option>
@@ -270,7 +271,7 @@ const CartPage = () => {
           </div>
 
           {/* Right - Summary */}
-          <div className="w-full lg:w-1/3 bg-gray-50 p-4 rounded shadow-md">
+          <div className="w-full lg:w-1/3 bg-gray-50 dark:bg-gray-800 p-4 rounded shadow-md">
             <h3 className="text-xl font-semibold mb-4">🧾 Order Summary</h3>
             <p>Total Items: {totalItems}</p>
             <p>Total Price: ₹{totalPrice}</p>
@@ -288,6 +289,7 @@ const CartPage = () => {
       )}
 
       <ToastContainer position="top-right" autoClose={2000} />
+      </div>
     </div>
   );
 };

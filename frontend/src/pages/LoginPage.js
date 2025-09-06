@@ -51,10 +51,10 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-pink-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center px-4">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-center text-orange-600 mb-2">Welcome Back 👋</h2>
-        <p className="text-center text-gray-600 mb-6">Please login to continue</p>
+        <h2 className="text-2xl font-bold text-center text-orange-600 dark:text-orange-400 mb-2">Welcome Back 👋</h2>
+        <p className="text-center text-gray-600 dark:text-gray-400 mb-6">Please login to continue</p>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <input
@@ -63,7 +63,7 @@ const LoginPage = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
           />
 
           <div className="relative">
@@ -73,7 +73,7 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
             <span
               onClick={() => setShowPassword((prev) => !prev)}
@@ -88,7 +88,7 @@ const LoginPage = () => {
           </div>
 
           <div className="flex justify-between text-sm">
-            <Link to="/forgot-password" className="text-orange-600 hover:underline">
+            <Link to="/forgot-password" className="text-orange-600 dark:text-orange-400 hover:underline">
               Forgot Password?
             </Link>
           </div>
@@ -104,9 +104,9 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <p className="text-sm text-center mt-6 text-gray-600">
+        <p className="text-sm text-center mt-6 text-gray-600 dark:text-gray-400">
           New user?{' '}
-          <Link to="/register" className="text-orange-600 hover:underline">
+          <Link to="/register" className="text-orange-600 dark:text-orange-400 hover:underline">
             Register here
           </Link>
         </p>

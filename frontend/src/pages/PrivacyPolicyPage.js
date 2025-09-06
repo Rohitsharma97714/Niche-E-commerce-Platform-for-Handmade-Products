@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../index.css';
 
-const PrivacyPolicyPage = () => {
+const PrivacyPolicyPage = ({ darkMode }) => {
   const [activeSection, setActiveSection] = useState('data-collection');
   const navigate = useNavigate();
 
@@ -26,21 +26,45 @@ const PrivacyPolicyPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden relative">
+    <div
+      className={`min-h-screen py-12 px-4 sm:px-6 lg:px-8 ${
+        darkMode
+          ? 'bg-gray-900 text-gray-100'
+          : 'bg-gradient-to-br from-orange-50 to-pink-50'
+      }`}
+    >
+      <div
+        className={`max-w-4xl mx-auto rounded-xl shadow-md overflow-hidden relative ${
+          darkMode ? 'bg-gray-800' : 'bg-white'
+        }`}
+      >
         {/* Back Button */}
         <button
           onClick={() => navigate('/')}
-          className="absolute top-4 left-4 flex items-center text-orange-600 hover:underline focus:outline-none"
+          className={`absolute top-4 left-4 flex items-center ${
+            darkMode ? 'text-orange-400' : 'text-orange-600'
+          } hover:underline focus:outline-none`}
         >
-          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5 mr-1"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
           Back
         </button>
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-center text-orange-600 mb-8">Privacy Policy</h1>
-          
+          <h1
+            className={`text-3xl font-bold text-center ${
+              darkMode ? 'text-orange-400' : 'text-orange-600'
+            } mb-8`}
+          >
+            Privacy Policy
+          </h1>
+
           <div className="flex flex-col md:flex-row gap-8">
             {/* Navigation */}
             <div className="md:w-1/4">
@@ -51,8 +75,16 @@ const PrivacyPolicyPage = () => {
                     onClick={() => setActiveSection(key)}
                     className={`block w-full text-left px-4 py-2 rounded-lg transition ${
                       activeSection === key
-                        ? 'bg-orange-100 text-orange-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? `${
+                            darkMode
+                              ? 'bg-orange-700 text-orange-200'
+                              : 'bg-orange-100 text-orange-700'
+                          } font-medium`
+                        : `${
+                            darkMode
+                              ? 'text-gray-300 hover:bg-gray-700'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`
                     }`}
                   >
                     {sections[key].title}
@@ -63,24 +95,65 @@ const PrivacyPolicyPage = () => {
 
             {/* Content */}
             <div className="md:w-3/4">
-              <div className="prose prose-orange max-w-none">
-                <h2 className="text-2xl font-semibold text-orange-600 mb-4">
+              <div className={`prose prose-orange max-w-none`}>
+                <h2
+                  className={`text-2xl font-semibold ${
+                    darkMode ? 'text-orange-400' : 'text-orange-600'
+                  } mb-4`}
+                >
                   {sections[activeSection].title}
                 </h2>
-                <p className="text-gray-700 mb-6">{sections[activeSection].content}</p>
-                
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-gray-800 mb-2">Effective Date: January 1, 2023</h3>
-                  <p className="text-sm text-gray-600">
+                <p
+                  className={`mb-6 ${
+                    darkMode ? 'text-gray-200' : 'text-gray-700'
+                  }`}
+                >
+                  {sections[activeSection].content}
+                </p>
+
+                <div
+                  className={`p-4 rounded-lg ${
+                    darkMode ? 'bg-gray-700' : 'bg-gray-50'
+                  }`}
+                >
+                  <h3
+                    className={`font-medium ${
+                      darkMode ? 'text-gray-200' : 'text-gray-800'
+                    } mb-2`}
+                  >
+                    Effective Date: January 1, 2023
+                  </h3>
+                  <p
+                    className={`text-sm ${
+                      darkMode ? 'text-gray-400' : 'text-gray-600'
+                    }`}
+                  >
                     Last updated: {new Date().toLocaleDateString()}
                   </p>
                 </div>
 
-                <div className="mt-8 border-t pt-6">
-                  <h3 className="font-medium text-gray-800 mb-2">Contact Us</h3>
-                  <p className="text-gray-600">
+                <div className={`mt-8 border-t pt-6`}>
+                  <h3
+                    className={`font-medium ${
+                      darkMode ? 'text-gray-300' : 'text-gray-800'
+                    } mb-2`}
+                  >
+                    Contact Us
+                  </h3>
+                  <p
+                    className={`${
+                      darkMode ? 'text-gray-400' : 'text-gray-600'
+                    }`}
+                  >
                     For privacy concerns, email us at{' '}
-                    <a href="mailto:privacy@desi-etsy.com" className="text-orange-600 hover:underline">
+                    <a
+                      href="mailto:privacy@desi-etsy.com"
+                      className={`${
+                        darkMode
+                          ? 'text-orange-400 hover:underline'
+                          : 'text-orange-600 hover:underline'
+                      }`}
+                    >
                       privacy@desi-etsy.com
                     </a>
                   </p>
@@ -90,12 +163,19 @@ const PrivacyPolicyPage = () => {
           </div>
 
           <div className="mt-8 text-center">
-            <Link 
-              to="/terms" 
-              className="inline-flex items-center text-orange-600 hover:underline"
+            <Link
+              to="/terms"
+              className={`inline-flex items-center ${
+                darkMode ? 'text-orange-400' : 'text-orange-600'
+              } hover:underline`}
             >
               View our Terms and Conditions
-              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 h-4 ml-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>

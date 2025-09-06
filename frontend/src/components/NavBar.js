@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext'; // ✅ Import wishlist context
-import { FiHeart, FiArrowLeft, FiHome } from 'react-icons/fi'; // ✅ Optional icons
+import { FiHeart, FiArrowLeft, FiHome, FiSun, FiMoon } from 'react-icons/fi'; // ✅ Optional icons
 
-const NavBar = () => {
+const NavBar = ({ darkMode, toggleDarkMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -36,12 +36,12 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-md px-4 py-3 flex items-center justify-between">
+    <nav className="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow-md px-4 py-3 flex items-center justify-between">
       {/* Left: Back Button */}
       {showBackButton ? (
         <button
           onClick={handleBack}
-          className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1"
+          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium flex items-center gap-1"
         >
           <FiArrowLeft /> Back
         </button>
@@ -49,11 +49,20 @@ const NavBar = () => {
         <div />
       )}
 
-      {/* Right: Home + Wishlist */}
+      {/* Right: Dark Mode Toggle + Home + Wishlist */}
       <div className="flex items-center gap-4 ml-auto">
+        {/* Dark Mode Toggle */}
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 focus:outline-none"
+          aria-label="Toggle dark mode"
+        >
+          {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
+        </button>
+
         <button
           onClick={handleHome}
-          className="text-green-600 hover:text-green-800 font-medium flex items-center gap-1"
+          className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 font-medium flex items-center gap-1"
         >
           <FiHome /> Home
         </button>
@@ -61,7 +70,7 @@ const NavBar = () => {
         {isCustomer && (
           <button
             onClick={goToWishlist}
-            className="relative text-pink-600 hover:text-pink-800 font-medium flex items-center gap-1"
+            className="relative text-pink-600 hover:text-pink-800 dark:text-pink-400 dark:hover:text-pink-300 font-medium flex items-center gap-1"
           >
             <FiHeart /> Wishlist
             {/* Optional Wishlist Count Badge */}

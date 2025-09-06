@@ -83,10 +83,10 @@ const RegisterPage = () => {
 };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-pink-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-pink-100 dark:from-gray-800 dark:to-gray-900 px-4">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-orange-600 text-center mb-2">Create an Account ✨</h2>
-        <p className="text-gray-600 text-center mb-6">Register to explore Desi-Etsy</p>
+        <h2 className="text-2xl font-bold text-orange-600 dark:text-orange-400 text-center mb-2">Create an Account ✨</h2>
+        <p className="text-gray-600 dark:text-gray-400 text-center mb-6">Register to explore Desi-Etsy</p>
 
         {step === 1 ? (
           <form
@@ -102,7 +102,7 @@ const RegisterPage = () => {
               value={form.name}
               onChange={e => setForm({ ...form, name: e.target.value })}
               required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
 
             <input
@@ -111,7 +111,7 @@ const RegisterPage = () => {
               value={form.email}
               onChange={e => setForm({ ...form, email: e.target.value })}
               required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
 
             <div className="relative">
@@ -121,7 +121,7 @@ const RegisterPage = () => {
                 value={form.password}
                 onChange={e => setForm({ ...form, password: e.target.value })}
                 required
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
@@ -132,13 +132,13 @@ const RegisterPage = () => {
             </div>
 
             {form.password && getPasswordError(form.password) && (
-              <p className="text-sm text-red-600">{getPasswordError(form.password)}</p>
+              <p className="text-sm text-red-600 dark:text-red-400">{getPasswordError(form.password)}</p>
             )}
 
             <select
               value={form.role}
               onChange={e => setForm({ ...form, role: e.target.value })}
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             >
               <option value="customer">Customer</option>
               <option value="artisan">Artisan</option>
@@ -158,7 +158,7 @@ const RegisterPage = () => {
               placeholder="Enter OTP sent to email"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
             <button
               onClick={handleVerifyOtp}
@@ -169,9 +169,9 @@ const RegisterPage = () => {
           </div>
         )}
 
-        <p className="text-sm text-center mt-6 text-gray-600">
+        <p className="text-sm text-center mt-6 text-gray-600 dark:text-gray-400">
           Already have an account?{' '}
-          <Link to="/login" className="text-orange-600 hover:underline">
+          <Link to="/login" className="text-orange-600 dark:text-orange-400 hover:underline">
             Login here
           </Link>
         </p>

@@ -34,28 +34,31 @@ const WishlistPage = () => {
 
   if (wishlistItems.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto mt-10 text-center text-gray-600">
-        <h2 className="text-2xl font-bold mb-4">Your Wishlist is Empty 💔</h2>
-        <button onClick={() => navigate('/')} className="text-blue-600 hover:underline">
-          Browse Products
-        </button>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-4xl mx-auto mt-10 text-center text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 p-8">
+          <h2 className="text-2xl font-bold mb-4">Your Wishlist is Empty 💔</h2>
+          <button onClick={() => navigate('/')} className="text-blue-600 dark:text-blue-400 hover:underline">
+            Browse Products
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-6xl mx-auto px-4 py-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       <h2 className="text-3xl font-bold mb-6">My Wishlist ❤️</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {wishlistItems.map(item => (
           <div
             key={item._id}
-            className="border rounded-lg p-4 shadow bg-white hover:shadow-lg transition-transform duration-200 hover:scale-[1.01]"
+            className="border rounded-lg p-4 shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-transform duration-200 hover:scale-[1.01]"
           >
             <img
               src={item.image}
               alt={item.title}
-              className="w-full h-48 object-contain mb-4 cursor-pointer"
+              className="w-full h-48 object-contain mb-4 cursor-pointer bg-white dark:bg-gray-700"
               onClick={() => handleShopNow(item)} // ✅ add to cart and go to cart
             />
             <h3
@@ -64,8 +67,8 @@ const WishlistPage = () => {
             >
               {item.title}
             </h3>
-            <p className="text-indigo-600">{item.category}</p>
-            <p className="text-gray-800 font-bold my-2">₹{item.price}</p>
+            <p className="text-indigo-600 dark:text-indigo-400">{item.category}</p>
+            <p className="text-gray-800 dark:text-gray-100 font-bold my-2">₹{item.price}</p>
 
             <div className="flex justify-between mt-4">
               <button
@@ -83,6 +86,7 @@ const WishlistPage = () => {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

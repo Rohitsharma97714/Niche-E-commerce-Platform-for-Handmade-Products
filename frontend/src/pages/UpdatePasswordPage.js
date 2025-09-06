@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import '../index.css';
 import { useNavigate } from "react-router-dom";
 
-const UpdatePasswordPage = () => {
+const UpdatePasswordPage = ({ darkMode }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showOld, setShowOld] = useState(false);
@@ -74,21 +74,21 @@ const UpdatePasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-pink-100 px-4">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-center text-orange-600 mb-4">Update Password 🔐</h2>
+    <div className={`min-h-screen flex items-center justify-center px-4 ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-orange-100 to-pink-100'}`}>
+      <div className={`shadow-lg rounded-lg p-8 w-full ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white'}`}>
+        <h2 className={`text-2xl font-bold text-center mb-4 ${darkMode ? 'text-orange-400' : 'text-orange-600'}`}>Update Password 🔐</h2>
 
         {email && (
           <input
             type="email"
             value={email}
             readOnly
-            className="w-full px-4 py-2 border rounded bg-gray-100 text-gray-700 cursor-not-allowed mb-4"
+            className={`w-full px-4 py-2 border rounded cursor-not-allowed mb-4 ${darkMode ? 'bg-gray-700 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-700'}`}
           />
         )}
 
         {success ? (
-          <p className="text-green-600 text-center font-semibold">Password updated successfully!</p>
+          <p className={`text-center font-semibold ${darkMode ? 'text-green-400' : 'text-green-600'}`}>Password updated successfully!</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
@@ -98,7 +98,7 @@ const UpdatePasswordPage = () => {
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 ${darkMode ? 'bg-gray-700 text-white border-gray-600' : ''}`}
               />
               <span
                 onClick={() => setShowOld(!showOld)}
@@ -115,7 +115,7 @@ const UpdatePasswordPage = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 ${darkMode ? 'bg-gray-700 text-white border-gray-600' : ''}`}
               />
               <span
                 onClick={() => setShowNew(!showNew)}
@@ -126,7 +126,7 @@ const UpdatePasswordPage = () => {
             </div>
 
             {newPassword && getPasswordError(newPassword) && (
-              <p className="text-sm text-red-600">{getPasswordError(newPassword)}</p>
+              <p className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-600'}`}>{getPasswordError(newPassword)}</p>
             )}
 
             <button
