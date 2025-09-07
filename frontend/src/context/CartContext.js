@@ -28,8 +28,9 @@ export const CartProvider = ({ children }) => {
         item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
       );
     }
-    // ✅ include artisan in cart item
-    return [...prev, { ...product, quantity: 1, artisan: product.artisan }];
+    // ✅ include artisan in cart item and use discounted price if provided
+    const price = product.price || product.originalPrice;
+    return [...prev, { ...product, quantity: 1, artisan: product.artisan, price }];
   });
 };
 

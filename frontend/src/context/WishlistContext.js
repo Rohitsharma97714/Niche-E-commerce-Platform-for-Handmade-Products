@@ -16,7 +16,17 @@ export const WishlistProvider = ({ children }) => {
 
   const addToWishlist = (item) => {
     if (!wishlistItems.some(p => p._id === item._id)) {
-      setWishlistItems([...wishlistItems, item]);
+      // ✅ Preserve discount information when adding to wishlist
+      const wishlistItem = {
+        ...item,
+        originalPrice: item.originalPrice || item.price,
+        discountPercentage: item.discountPercentage || 0,
+        // Calculate discounted price if discount exists
+        price: item.discountPercentage > 0 ?
+          Math.round((item.originalPrice || item.price) * (1 - item.discountPercentage / 100)) :
+          (item.price || item.originalPrice)
+      };
+      setWishlistItems([...wishlistItems, wishlistItem]);
     }
   };
 

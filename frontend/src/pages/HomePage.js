@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { FiSun, FiMoon, FiMenu, FiX, FiHome, FiInfo, FiShoppingCart, FiUser, FiPackage, FiHeart, FiSearch, FiChevronDown, FiStar, FiTruck } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,6 +8,124 @@ import bannerImg from '../assets/Banner-img.jpg';
 import videoSrc from '../assets/desi-craft.mp4';
 import { useWishlist } from '../context/WishlistContext';
 
+// Optimized Product Card Component
+const ProductCard = React.memo(({ product, isInWishlist, onWishlistToggle, onCategoryClick }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageLoad = useCallback(() => {
+    setImageLoaded(true);
+  }, []);
+
+  const handleImageError = useCallback(() => {
+    setImageError(true);
+    setImageLoaded(true);
+  }, []);
+
+  // Preload first few images
+  useEffect(() => {
+    if (product.image && !imageLoaded) {
+      const img = new Image();
+      img.src = product.image;
+      img.onload = handleImageLoad;
+      img.onerror = handleImageError;
+    }
+  }, [product.image, handleImageLoad, handleImageError, imageLoaded]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex-shrink-0 w-64"
+    >
+      <Link
+        to={`/product/${product._id}?discount=${product.discountPercentage}`}
+        className="group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block relative"
+      >
+        {/* Wishlist Button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onWishlistToggle(product);
+          }}
+          className="absolute top-3 right-3 z-10 p-2 bg-white dark:bg-gray-700 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+          aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          <FiHeart
+            className={`w-5 h-5 ${isInWishlist ? 'text-red-500 fill-current' : 'text-gray-400'}`}
+          />
+        </button>
+
+        {/* Product Image with lazy loading */}
+        <div className="relative h-48 overflow-hidden">
+          {!imageLoaded && !imageError && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="animate-pulse bg-gray-300 dark:bg-gray-600 w-full h-full rounded"></div>
+            </div>
+          )}
+          {!imageError ? (
+            <img
+              src={product.image}
+              alt={product.title}
+              className={`w-full h-full object-contain transition-all duration-500 group-hover:scale-105 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              loading="lazy"
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 h-full">
+              <svg className="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+              </svg>
+              <span className="text-xs">Image unavailable</span>
+            </div>
+          )}
+        </div>
+
+        {/* Product Info */}
+        <div className="p-4">
+          <h4 className="font-semibold text-lg mb-1 group-hover:text-orange-600 transition-colors line-clamp-2">
+            {product.title}
+          </h4>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{product.category}</p>
+
+          <div className="flex items-center mb-2">
+            <div className="flex text-yellow-400">
+              {[...Array(5)].map((_, i) => (
+                <FiStar
+                  key={i}
+                  className={`w-4 h-4 ${i < Math.floor(product.rating || 4) ? 'fill-current' : ''}`}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({product.reviews || 24})</span>
+          </div>
+
+          <div className="flex justify-between items-center mt-3">
+            {product.discountPercentage > 0 ? (
+              <div className="flex flex-col">
+                <span className="text-gray-500 dark:text-gray-400 line-through text-sm">₹{product.price}</span>
+                <span className="text-red-600 font-bold text-lg">
+                  ₹{Math.round(product.price * (1 - product.discountPercentage / 100))}
+                </span>
+              </div>
+            ) : (
+              <span className="text-orange-600 font-bold text-lg">₹{product.price}</span>
+            )}
+            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+              <FiTruck className="mr-1" /> Free delivery
+            </span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+});
+
 const HomePage = ({ darkMode, toggleDarkMode }) => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,7 +133,6 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
 
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
   const dropdownRef = useRef();
@@ -60,15 +177,36 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  // ✅ Filtering
-  const filteredProducts = products.filter(p => {
-    const matchesTitle = p.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory ? p.category === selectedCategory : true;
-    return matchesTitle && matchesCategory;
-  });
+  // ✅ Debounced search for better performance
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearchTerm(searchTerm), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
-  const isInWishlist = (id) => wishlistItems.some(p => p._id === id);
+  // ✅ Memoized filtering and calculations for performance
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+      const matchesTitle = p.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const matchesCategory = selectedCategory ? p.category === selectedCategory : true;
+      return matchesTitle && matchesCategory;
+    });
+  }, [products, debouncedSearchTerm, selectedCategory]);
+
+  const categories = useMemo(() => [...new Set(products.map(p => p.category).filter(Boolean))], [products]);
+
+  const isInWishlist = useCallback((id) => wishlistItems.some(p => p._id === id), [wishlistItems]);
+
+  // ✅ Optimized wishlist toggle handler
+  const handleWishlistToggle = useCallback((product) => {
+    if (isInWishlist(product._id)) {
+      removeFromWishlist(product._id);
+      toast.success('Removed from wishlist');
+    } else {
+      addToWishlist(product);
+      toast.success('Added to wishlist');
+    }
+  }, [isInWishlist, addToWishlist, removeFromWishlist]);
 
 
 
@@ -434,79 +572,20 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="flex-shrink-0 w-64"
                   >
-                    <Link
-                      to={`/product/${p._id}`}
-                      className="group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block relative"
-                    >
-                      {/* Wishlist Button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          isInWishlist(p._id) ? removeFromWishlist(p._id) : addToWishlist(p);
-                          toast.success(isInWishlist(p._id) ? 'Removed from wishlist' : 'Added to wishlist');
-                        }}
-                        className="absolute top-3 right-3 z-10 p-2 bg-white dark:bg-gray-700 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                        aria-label={isInWishlist(p._id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                      >
-                        <FiHeart
-                          className={`w-5 h-5 ${isInWishlist(p._id) ? 'text-red-500 fill-current' : 'text-gray-400'}`}
-                        />
-                      </button>
-
+                    <div className="relative">
                       {/* Top Seller Badge */}
-                      <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                      <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
                         🏆 Top Seller
                       </span>
 
-                      {/* Product Image */}
-                      <div className="relative h-48 overflow-hidden">
-                        <img
-                          src={p.image}
-                          alt={p.title}
-                          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="p-4">
-                        <h4 className="font-semibold text-lg mb-1 group-hover:text-orange-600 transition-colors line-clamp-2">
-                          {p.title}
-                        </h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{p.category}</p>
-
-                        <div className="flex items-center mb-2">
-                          <div className="flex text-yellow-400">
-                            {[...Array(5)].map((_, i) => (
-                              <FiStar
-                                key={i}
-                                className={`w-4 h-4 ${i < Math.floor(p.rating || 4) ? 'fill-current' : ''}`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({p.reviews || 24})</span>
-                        </div>
-
-                  <div className="flex justify-between items-center mt-3">
-                    {p.discountPercentage > 0 ? (
-                      <div className="flex flex-col">
-                        <span className="text-gray-500 dark:text-gray-400 line-through text-sm">₹{p.price}</span>
-                        <span className="text-red-600 font-bold text-lg">
-                          ₹{Math.round(p.price * (1 - p.discountPercentage / 100))}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-orange-600 font-bold text-lg">₹{p.price}</span>
-                    )}
-                    <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                      <FiTruck className="mr-1" /> Free delivery
-                    </span>
-                  </div>
-                      </div>
-                    </Link>
+                      <ProductCard
+                        product={p}
+                        isInWishlist={isInWishlist(p._id)}
+                        onWishlistToggle={handleWishlistToggle}
+                        onCategoryClick={handleCategoryClick}
+                      />
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -526,75 +605,20 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="flex-shrink-0 w-64"
                   >
-                    <Link
-                      to={`/product/${p._id}`}
-                      className="group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block relative"
-                    >
-                      {/* Wishlist Button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          isInWishlist(p._id) ? removeFromWishlist(p._id) : addToWishlist(p);
-                          toast.success(isInWishlist(p._id) ? 'Removed from wishlist' : 'Added to wishlist');
-                        }}
-                        className="absolute top-3 right-3 z-10 p-2 bg-white dark:bg-gray-700 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                        aria-label={isInWishlist(p._id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                      >
-                        <FiHeart
-                          className={`w-5 h-5 ${isInWishlist(p._id) ? 'text-red-500 fill-current' : 'text-gray-400'}`}
-                        />
-                      </button>
-
+                    <div className="relative">
                       {/* Discount Badge */}
-                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
                         {p.discountPercentage}% OFF
                       </span>
 
-                      {/* Product Image */}
-                      <div className="relative h-48 overflow-hidden">
-                        <img
-                          src={p.image}
-                          alt={p.title}
-                          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="p-4">
-                        <h4 className="font-semibold text-lg mb-1 group-hover:text-orange-600 transition-colors line-clamp-2">
-                          {p.title}
-                        </h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{p.category}</p>
-
-                        <div className="flex items-center mb-2">
-                          <div className="flex text-yellow-400">
-                            {[...Array(5)].map((_, i) => (
-                              <FiStar
-                                key={i}
-                                className={`w-4 h-4 ${i < Math.floor(p.rating || 4) ? 'fill-current' : ''}`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({p.reviews || 24})</span>
-                        </div>
-
-                        <div className="flex justify-between items-center mt-3">
-                          <div className="flex flex-col">
-                            <span className="text-gray-500 dark:text-gray-400 line-through text-sm">₹{p.price}</span>
-                            <span className="text-red-600 font-bold text-lg">
-                              ₹{Math.round(p.price * (1 - p.discountPercentage / 100))}
-                            </span>
-                          </div>
-                          <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                            <FiTruck className="mr-1" /> Free delivery
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
+                      <ProductCard
+                        product={p}
+                        isInWishlist={isInWishlist(p._id)}
+                        onWishlistToggle={handleWishlistToggle}
+                        onCategoryClick={handleCategoryClick}
+                      />
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -614,82 +638,23 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="flex-shrink-0 w-64"
                   >
-                    <Link
-                      to={`/product/${p._id}`}
-                      className="group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block relative"
-                    >
-                      {/* Wishlist Button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          isInWishlist(p._id) ? removeFromWishlist(p._id) : addToWishlist(p);
-                          toast.success(isInWishlist(p._id) ? 'Removed from wishlist' : 'Added to wishlist');
-                        }}
-                        className="absolute top-3 right-3 z-10 p-2 bg-white dark:bg-gray-700 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                        aria-label={isInWishlist(p._id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                      >
-                        <FiHeart
-                          className={`w-5 h-5 ${isInWishlist(p._id) ? 'text-red-500 fill-current' : 'text-gray-400'}`}
-                        />
-                      </button>
-
+                    <div className="relative">
                       {/* New Arrival Badge */}
-                      <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                      <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
                         ✨ New
                       </span>
 
-                      {/* Product Image */}
-                      <div className="relative h-48 overflow-hidden">
-                        <img
-                          src={p.image}
-                          alt={p.title}
-                          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="p-4">
-                        <h4 className="font-semibold text-lg mb-1 group-hover:text-orange-600 transition-colors line-clamp-2">
-                          {p.title}
-                        </h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{p.category}</p>
-
-                        <div className="flex items-center mb-2">
-                          <div className="flex text-yellow-400">
-                            {[...Array(5)].map((_, i) => (
-                              <FiStar
-                                key={i}
-                                className={`w-4 h-4 ${i < Math.floor(p.rating || 4) ? 'fill-current' : ''}`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({p.reviews || 24})</span>
-                        </div>
-
-                  <div className="flex justify-between items-center mt-3">
-                    {p.discountPercentage > 0 ? (
-                      <div className="flex flex-col">
-                        <span className="text-gray-500 dark:text-gray-400 line-through text-sm">₹{p.price}</span>
-                        <span className="text-red-600 font-bold text-lg">
-                          ₹{Math.round(p.price * (1 - p.discountPercentage / 100))}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-orange-600 font-bold text-lg">₹{p.price}</span>
-                    )}
-                    <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                      <FiTruck className="mr-1" /> Free delivery
-                    </span>
-                  </div>
-                      </div>
-                    </Link>
+                      <ProductCard
+                        product={p}
+                        isInWishlist={isInWishlist(p._id)}
+                        onWishlistToggle={handleWishlistToggle}
+                        onCategoryClick={handleCategoryClick}
+                      />
+                    </div>
                   </motion.div>
-          ))}
-        </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -705,94 +670,37 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="flex-shrink-0 w-64"
             >
-              <Link
-                to={`/product/${p._id}`}
-                className="group bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block relative"
-              >
-                {/* Wishlist Button */}
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    isInWishlist(p._id) ? removeFromWishlist(p._id) : addToWishlist(p);
-                    toast.success(isInWishlist(p._id) ? 'Removed from wishlist' : 'Added to wishlist');
-                  }}
-                  className="absolute top-3 right-3 z-10 p-2 bg-white dark:bg-gray-700 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                  aria-label={isInWishlist(p._id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                >
-                  <FiHeart
-                    className={`w-5 h-5 ${isInWishlist(p._id) ? 'text-red-500 fill-current' : 'text-gray-400'}`}
-                  />
-                </button>
+              <div className="relative">
+                {/* Product Badges */}
+                {p.rating >= 4.5 && (
+                  <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
+                    🌟 Best Seller
+                  </span>
+                )}
+                {p.discountPercentage > 0 && (
+                  <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
+                    {p.discountPercentage}% OFF
+                  </span>
+                )}
+                {p.isTopSeller && !p.discountPercentage && p.rating < 4.5 && (
+                  <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
+                    🏆 Top Seller
+                  </span>
+                )}
+                {p.isNewArrival && !p.discountPercentage && !p.isTopSeller && (
+                  <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
+                    ✨ New
+                  </span>
+                )}
 
-                {/* Product Image */}
-                <div className="relative h-60 overflow-hidden">
-                  <img
-                    src={p.image}
-                    alt={p.title}
-                    className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  {p.rating >= 4.5 && (
-                    <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
-                      🌟 Best Seller
-                    </span>
-                  )}
-                  {p.discountPercentage > 0 && (
-                    <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                      {p.discountPercentage}% OFF
-                    </span>
-                  )}
-                  {p.isTopSeller && !p.discountPercentage && p.rating < 4.5 && (
-                    <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
-                      🏆 Top Seller
-                    </span>
-                  )}
-                  {p.isNewArrival && !p.discountPercentage && !p.isTopSeller && (
-                    <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
-                      ✨ New
-                    </span>
-                  )}
-                </div>
-
-                {/* Product Info */}
-                <div className="p-4">
-                  <h4 className="font-semibold text-lg mb-1 group-hover:text-orange-600 transition-colors">
-                    {p.title}
-                  </h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{p.category}</p>
-                  
-                  <div className="flex items-center mb-2">
-                    <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
-                        <FiStar
-                          key={i}
-                          className={`w-4 h-4 ${i < Math.floor(p.rating || 4) ? 'fill-current' : ''}`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({p.reviews || 24})</span>
-                  </div>
-
-                  <div className="flex justify-between items-center mt-3">
-                    {p.discountPercentage > 0 ? (
-                      <div className="flex flex-col">
-                        <span className="text-gray-500 dark:text-gray-400 line-through text-sm">₹{p.price}</span>
-                        <span className="text-red-600 font-bold text-lg">
-                          ₹{Math.round(p.price * (1 - p.discountPercentage / 100))}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-orange-600 font-bold text-lg">₹{p.price}</span>
-                    )}
-                    <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                      <FiTruck className="mr-1" /> Free delivery
-                    </span>
-                  </div>
-                </div>
-              </Link>
+                <ProductCard
+                  product={p}
+                  isInWishlist={isInWishlist(p._id)}
+                  onWishlistToggle={handleWishlistToggle}
+                  onCategoryClick={handleCategoryClick}
+                />
+              </div>
             </motion.div>
           ))}
         </div>
@@ -909,8 +817,8 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
             <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
             <div className="text-sm text-gray-300 space-y-2">
               <p>📧 support@desietsy.com</p>
-              <p>📞 +91 9876543210</p>
-              <p>📍 Bangalore, India</p>
+              <p>📞 +91-9771408819</p>
+              <p>📍 Odisha, India</p>
             </div>
             <div className="flex gap-4 mt-4">
               <button className="text-gray-400 hover:text-white transition-colors">

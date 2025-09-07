@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useCart } from '../context/CartContext';
 import { toast, ToastContainer } from 'react-toastify';
@@ -10,6 +10,7 @@ import '../index.css';
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { cartItems, addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
@@ -17,6 +18,8 @@ const ProductDetailsPage = () => {
   const [quantity, setQuantity] = useState(1);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
+  // Get discount from URL query parameter
+  const discountPercentage = parseInt(searchParams.get('discount')) || 0;
 
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -47,7 +50,14 @@ const ProductDetailsPage = () => {
     if (alreadyInCart) {
       toast.warn('Product already in cart');
     } else {
-      addToCart({ ...product, quantity });
+      const discountedPrice = discountPercentage > 0 ? Math.round(product.price * (1 - discountPercentage / 100)) : product.price;
+      addToCart({
+        ...product,
+        quantity,
+        price: discountedPrice,
+        originalPrice: product.price,
+        discountPercentage: discountPercentage > 0 ? discountPercentage : 0
+      });
       toast.success('Added to cart');
     }
   };
@@ -83,7 +93,19 @@ const ProductDetailsPage = () => {
             </span>
           </div>
 
-          <p className="text-xl text-gray-800 font-semibold dark:text-gray-200">₹{product.price}</p>
+          {discountPercentage > 0 ? (
+            <div className="flex flex-col">
+              <span className="text-gray-500 dark:text-gray-400 line-through text-lg">₹{product.price}</span>
+              <span className="text-red-600 font-bold text-xl">
+                ₹{Math.round(product.price * (1 - discountPercentage / 100))}
+              </span>
+              <span className="text-green-600 text-sm font-medium">
+                {discountPercentage}% OFF
+              </span>
+            </div>
+          ) : (
+            <p className="text-xl text-gray-800 font-semibold dark:text-gray-200">₹{product.price}</p>
+          )}
           <p className="text-gray-700 dark:text-gray-300">{product.description}</p>
 
           <div className="flex items-center gap-2">
@@ -121,7 +143,14 @@ const ProductDetailsPage = () => {
                   removeFromWishlist(product._id);
                   toast.info('Removed from Wishlist');
                 } else {
-                  addToWishlist(product);
+                  // ✅ Pass discount information when adding to wishlist
+                  const wishlistItem = {
+                    ...product,
+                    originalPrice: product.price,
+                    discountPercentage: discountPercentage > 0 ? discountPercentage : 0,
+                    price: discountPercentage > 0 ? Math.round(product.price * (1 - discountPercentage / 100)) : product.price
+                  };
+                  addToWishlist(wishlistItem);
                   toast.success('Added to Wishlist ❤️');
                 }
               }}
@@ -139,7 +168,14 @@ const ProductDetailsPage = () => {
                 }
 
                 if (!alreadyInCart) {
-                  addToCart({ ...product, quantity });
+                  const discountedPrice = discountPercentage > 0 ? Math.round(product.price * (1 - discountPercentage / 100)) : product.price;
+                  addToCart({
+                    ...product,
+                    quantity,
+                    price: discountedPrice,
+                    originalPrice: product.price,
+                    discountPercentage: discountPercentage > 0 ? discountPercentage : 0
+                  });
                   toast.success('Added to cart');
                 }
 
