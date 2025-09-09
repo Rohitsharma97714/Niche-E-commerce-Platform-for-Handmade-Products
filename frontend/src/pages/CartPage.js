@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect, Suspense } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useCart } from '../context/CartContext';
 import { toast, ToastContainer } from 'react-toastify';
