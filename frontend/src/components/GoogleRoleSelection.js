@@ -15,7 +15,7 @@ const GoogleRoleSelection = ({ onRoleSelect }) => {
         className="w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded font-semibold transition hover:bg-gray-50 flex items-center justify-center gap-2"
       >
         <FaGoogle className="text-red-500" />
-        Sign in with Google
+        Sign in with Google (for customers only)
       </button>
     </div>
   );
