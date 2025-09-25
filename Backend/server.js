@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const crypto = require('crypto');
 const session = require('express-session');
+const passport = require('passport');
 
 // Import route files
 const authRoutes = require('./routes/authRoutes');
@@ -16,28 +17,29 @@ const emailRoutes = require('./routes/emailRoutes');
 
 const app = express();
 
-// Generate server key on startup for token invalidation
+// ✅ Generate server key on startup for JWT token invalidation
 global.serverKey = crypto.randomBytes(32).toString('hex');
 console.log('Server started with key:', global.serverKey);
 
-
 // ✅ CORS setup
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({
+  origin: ["http://localhost:3000", "https://niche-e-commerce-platform-for-handm.vercel.app"], // your frontend origins
+  credentials: true
+}));
 
-// ✅ Session middleware (required for Passport.js)
+// ✅ Session middleware (needed for Passport)
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+  secret: process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex'),
   resave: false,
-  saveUninitialized: true, // Changed to true to ensure session is created
+  saveUninitialized: false, // safer default
   cookie: {
-    secure: false, // Set to true in production with HTTPS
+    secure: process.env.NODE_ENV === 'production', // true for HTTPS in production
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    httpOnly: true // Helps prevent XSS attacks
+    httpOnly: true
   }
 }));
 
 // ✅ Initialize Passport
-const passport = require('passport');
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -60,9 +62,7 @@ passport.deserializeUser(async (id, done) => {
 app.use(express.json());
 
 // ✅ Health check route
-app.get('/', (req, res) => {
-  res.send('✅ Backend is running!');
-});
+app.get('/', (req, res) => res.send('✅ Backend is running!'));
 
 // ✅ API Routes
 app.use('/api/auth', authRoutes);
@@ -77,8 +77,9 @@ app.use('/api/email', emailRoutes);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Connection Error:', err));
+})
+.then(() => console.log('✅ MongoDB Connected'))
+.catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;
