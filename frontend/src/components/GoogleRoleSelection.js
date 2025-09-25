@@ -5,8 +5,7 @@ const GoogleRoleSelection = ({ onRoleSelect }) => {
   const handleGoogleLogin = () => {
     // Use BACKEND_URL instead of API_URL
     const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-    const baseUrl = backendUrl.replace(/\/$/, ''); // remove trailing slash
-    window.location.href = `${baseUrl}/api/auth/google`;
+    window.location.href = `${backendUrl}/api/auth/google`;
   };
 
   return (
