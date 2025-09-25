@@ -11,6 +11,11 @@ const protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Check if server key matches
+    if (decoded.serverKey !== global.serverKey) {
+      console.log('Token invalidated due to server restart for user:', decoded.id);
+      return res.status(401).json({ message: 'Token invalidated due to server restart' });
+    }
     req.user = decoded; // You’ll access this in routes like req.user._id
     next();
   } catch (err) {

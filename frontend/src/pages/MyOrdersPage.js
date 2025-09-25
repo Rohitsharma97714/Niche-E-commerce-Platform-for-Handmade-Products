@@ -57,7 +57,9 @@ const MyOrdersPage = ({ darkMode }) => {
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'}`}>
       <div className="max-w-5xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-100">🧾 My Orders</h2>
+      <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent drop-shadow dark:from-blue-400 dark:to-purple-400">
+  🧾 My Orders</h2>
+
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">

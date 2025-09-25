@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const crypto = require('crypto');
+const session = require('express-session');
 
 // Import route files
 const authRoutes = require('./routes/authRoutes');
@@ -14,10 +16,45 @@ const emailRoutes = require('./routes/emailRoutes');
 
 const app = express();
 
+// Generate server key on startup for token invalidation
+global.serverKey = crypto.randomBytes(32).toString('hex');
+console.log('Server started with key:', global.serverKey);
+
 
 // ✅ CORS setup
 app.use(cors({ origin: "*", credentials: true }));
 
+// ✅ Session middleware (required for Passport.js)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+  resave: false,
+  saveUninitialized: true, // Changed to true to ensure session is created
+  cookie: {
+    secure: false, // Set to true in production with HTTPS
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true // Helps prevent XSS attacks
+  }
+}));
+
+// ✅ Initialize Passport
+const passport = require('passport');
+app.use(passport.initialize());
+app.use(passport.session());
+
+// ✅ Passport serialization
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const User = require('./models/User');
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
 
 // ✅ Middleware
 app.use(express.json());

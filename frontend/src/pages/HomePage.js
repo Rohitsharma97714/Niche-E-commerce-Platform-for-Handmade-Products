@@ -130,12 +130,10 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
-  const dropdownRef = useRef();
   const mobileMenuRef = useRef();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user')) || null;
@@ -170,7 +168,6 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setShowDropdown(false);
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) setMobileMenuOpen(false);
     };
     document.addEventListener('mousedown', handleOutsideClick);
@@ -319,33 +316,9 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
           </Link>
 
           {user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="hover:text-orange-600 transition-colors flex items-center gap-1"
-              >
-                <FiUser /> {user.name} <FiChevronDown className="text-xs" />
-              </button>
-              {showDropdown && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
-                >
-                  <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                    <p className="font-semibold text-gray-800 dark:text-gray-200">{user.name}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
-                  </div>
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-3 hover:bg-orange-50 dark:hover:bg-gray-700 flex items-center gap-2"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    <FiUser /> Profile
-                  </Link>
-                </motion.div>
-              )}
-            </div>
+            <Link to="/profile" className="hover:text-orange-600 transition-colors flex items-center gap-1">
+              <FiUser /> {user.name}
+            </Link>
           ) : (
             <Link to="/login" className="hover:text-orange-600 transition-colors flex items-center gap-1">
               <FiUser /> Login
@@ -454,29 +427,17 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
               </Link>
 
               {user ? (
-                <>
-                  <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700">
-                    <div className="p-3 text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center gap-3">
-                        <FiUser className="flex-shrink-0" />
-                        <span className="truncate font-semibold">{user.name}</span>
-                      </div>
-                      <p className="text-sm mt-1">{user.email}</p>
-                    </div>
-                  </div>
-                  
-                  <Link
-                    to="/profile"
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <FiUser className="flex-shrink-0" />
-                    <span>Profile</span>
-                  </Link>
-                </>
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <FiUser className="flex-shrink-0" />
+                  <span>{user.name}</span>
+                </Link>
               ) : (
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
                   onClick={() => setMobileMenuOpen(false)}
                 >

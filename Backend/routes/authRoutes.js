@@ -5,6 +5,8 @@ const User = require('../models/User');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
 const nodemailer = require('nodemailer');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // 🔒 Update Password (authenticated)
 // Update the route to use authMiddleware and get user from token
@@ -149,8 +151,8 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-    // ✅ Generate a JWT token
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    // ✅ Generate a JWT token with server key
+    const token = jwt.sign({ id: user._id, role: user.role, serverKey: global.serverKey }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     });
 
@@ -209,6 +211,68 @@ router.put('/profile', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Profile update error:', err);
     res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// Google OAuth
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/auth/google/callback`
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const { email, name, picture } = profile._json;
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user as customer
+      user = new User({
+        name,
+        email,
+        profilePicture: picture,
+        role: 'customer',
+        userType: 'customer',
+        isApproved: true,
+        isGoogleUser: true
+      });
+      await user.save();
+    } else {
+      // Update existing user to customer if not already, and set Google flags
+      if (user.role !== 'customer') {
+        user.role = 'customer';
+        user.userType = 'customer';
+        user.isApproved = true; // Customers are approved by default
+      }
+      user.profilePicture = picture;
+      user.isGoogleUser = true;
+      await user.save();
+    }
+    return done(null, user);
+  } catch (err) {
+    return done(err, null);
+  }
+}));
+
+router.get('/google', (req, res, next) => {
+  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
+
+router.get('/google/callback', passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=google_auth_failed` }), async (req, res) => {
+  try {
+    console.log('Google callback initiated');
+    console.log('User from passport:', req.user);
+
+    // User is already set as customer in the strategy, no further updates needed
+
+    const token = jwt.sign({ id: req.user._id, role: req.user.role, serverKey: global.serverKey }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const redirectUrl = `${frontendUrl}/login?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`;
+    console.log('Redirecting to:', redirectUrl);
+    res.redirect(redirectUrl);
+  } catch (err) {
+    console.error('Google callback error:', err);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    res.redirect(`${frontendUrl}/login?error=google_callback_error`);
   }
 });
 

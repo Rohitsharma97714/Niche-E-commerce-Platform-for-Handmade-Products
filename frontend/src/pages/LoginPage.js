@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../index.css'; // Tailwind / global styles
+import GoogleRoleSelection from '../components/GoogleRoleSelection';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -49,6 +50,43 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
+
+
+
+
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const user = urlParams.get('user');
+    const error = urlParams.get('error');
+
+    if (error) {
+      toast.error(`Google authentication failed: ${error}`);
+      // Clear the URL parameters to prevent re-processing
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+
+    if (token && user) {
+      try {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', decodeURIComponent(user));
+        toast.success('Google login successful!');
+        const userObj = JSON.parse(decodeURIComponent(user));
+        const role = userObj.role;
+        if (role === 'admin') navigate('/admin/dashboard');
+        else if (role === 'artisan') navigate('/artisan/dashboard');
+        else navigate('/');
+        // Clear the URL parameters to prevent re-processing
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (err) {
+        console.error('Error processing Google callback:', err);
+        toast.error('Error processing authentication response');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-100 to-pink-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center px-4">
@@ -103,6 +141,13 @@ const LoginPage = () => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+
+        <div className="mt-6">
+          <GoogleRoleSelection onRoleSelect={(role) => {
+            // Role selection is handled within the component
+            console.log('Selected role:', role);
+          }} />
+        </div>
 
         <p className="text-sm text-center mt-6 text-gray-600 dark:text-gray-400">
           New user?{' '}
